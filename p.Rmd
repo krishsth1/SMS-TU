@@ -1,0 +1,120 @@
+---
+title: "Project insurance"
+author: "Krishna Kumar Shrestha"
+date: "02/14/2020"
+output: 
+  html_document:
+    code_folding: hide
+    social: menu
+    source: embed
+    fontsize: 14pt
+---
+<font size="4">
+
+
+# Introduction  
+- When you have an insurance policy, the company charges you money in exchange for that coverage. That cost is known as the insurance premium. In health insurance ,Cost of premium depends majorly on amount of expected costs of health care. So before we calculate the premium we need to find out expected  Medical care expenses.
+
+-  We can find expected  Medical care expenses using liner regression . For this purpose i have used data form  [here](https://www.kaggle.com/mirichoi0218/insurance).
+
+
+# Abbreviation used in data
+-  BMI = Body mass index (in kg/m^2)
+
+
+
+# Reading  data
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE,size="huge"}
+
+library(readr)
+library(DT)
+insurance <- read_csv("project demo/data/insurance.csv")
+datatable(insurance,filter = "top")
+
+
+
+```
+
+
+#  Descriptive Analysis
+
+ Here we see the Measure of central tendency  
+ 
+ 
+```{r}
+
+summary(insurance)
+
+```
+
+
+# Here we see the measure of Dispersion.
+
+
+# Correlation
+```{r,size="huge"}
+
+
+cor(insurance[c("age","bmi","children","charges")])
+
+
+
+
+
+```
+
+
+
+## Predictive analysis  
+
+ first we model using the backward selection 
+```{r,size="huge"}
+model1 <- lm(charges ~ . ,data = insurance)
+summary(model1)
+
+
+
+
+
+```
+
+## Improve the model 
+
+
+
+```{r,size="huge"}
+insurance$bmi30 <- ifelse(insurance$bmi >= 30, 1, 0)
+
+model2 <- lm(charges~ age + children + bmi + sex + bmi30:smoker + region , data = insurance)
+
+summary(model2)
+
+```
+
+# Data Visualization 
+
+
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggplot2)
+library(ggthemes)
+
+
+ggplot(insurance) +
+ aes(x = region, y = charges) +
+ geom_boxplot(fill = "#75b8d1") +
+ labs(x = "Region", y = "Charges", title = "Box Plot", caption = "Visualization") +
+ theme_economist()
+
+
+
+```
+
+
+
+
+
+
+

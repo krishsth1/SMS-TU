@@ -1,0 +1,169 @@
+---
+title: "Actuarial Mathematics"
+author: "Krishna Kumar Shrestha"
+date: "2/14/2020"
+output: slidy_presentation
+    
+---
+## Data Analysis
+> Data analysis is a method in which data is collected and organized so that one can derive helpful information from it for specific purpose.
+
+## Forms of Data Analysis
+
+- Descriptive
+- Inferential
+- Predictive
+
+
+
+##  Descriptive
+
+> Descriptive analysis is an important first step for conducting statistical analyses. It gives you an idea of the distribution of your data, helps you detect outliers , and enable you identify associations among variables, thus preparing you for conducting further statistical analyses.
+
+
+
+>  Two key measures, or parameters, used in a descriptive analysis are
+
+
+-   Measure of central tendency 
+-   Dispersion.
+
+
+
+## Inferential analysis
+
+
+> Inferential statistics are usually the most important part of a dissertation's statistical analysis. Inferential statistics are used to allow a researcher to make statistical inferences, that is draw conclusions about the study population based upon the sample data.
+
+
+
+## Predictive analysis
+> It involve using of past data to predict  about future outcomes.
+
+## Data Analysis Process
+
+
+![Data Analysis Process](Data_visualization_process_v1.png){ width=70% }
+
+## Data sources
+
+> Data collection plays a very crucial role in the statistical analysis. In research, there are different methods used to gather information, all of which fall into two categories, i.e. primary data, and secondary data. 
+
+> Primary data  
+
+- Primary data refers to the first hand data gathered by the researcher himself.
+-The data can be collected through various methods like surveys, observations, physical testing, mailed questionnaires, questionnaire filled and sent by enumerators, personal interviews, telephonic interviews, focus groups, case studies, etc.
+
+
+>  Secondary Data
+
+
+
+- Secondary data implies second-hand information which is already collected and recorded by any person other than the user for a purpose, not relating to the current research problem
+
+-  It is the readily available form of data collected from various sources like censuses, government publications, internal records of the organisation, reports, books, journal articles, websites and so on.
+
+
+
+## Ways reduce the effect of bias
+
+- simple random sampling
+- stratified sampling
+
+
+## Different ways of data collection affect analysis :
+
+- Cross-sectional data involves recording values of the variables of interest for each case in the sample at a single moment in time.
+- Longitudinal data involves recording values at intervals over time.
+
+- Censored data occurs when the value of a variable is only partially known, for
+example, if a subject in a survival study withdraws, or survives beyond the end of
+the study: here a lower bound for the survival period is known but the exact value
+isn’t.
+- Truncated data occurs when measurements on some variables are not recorded so
+are completely unknown.
+
+
+## Big data
+- Big data is a field that treats ways to analyze, systematically extract information from, or otherwise deal with data sets that are too large or complex to be dealt with by traditional data-processing application software.  
+
+
+
+The properties that can lead data to be classified as ‘big’ include:  
+
+- Size, not only does big data include a very large number of individual cases, but each might include very many variables, a high proportion of which might have
+empty (or null) values – leading to sparse data  
+
+- Speed, the data to be analysed might be arriving in real time at a very fast rate – for example, from an array of sensors taking measurements thousands of time every second;  
+
+- Variety, big data is often composed of elements from many different sources which could have very different structures – or is often largely unstructured;  
+
+- Reliability, given the above three characteristics we can see that the reliability of individual data elements might be difficult to ascertain and could vary over time (for example, an internet connected sensor could go offline for a period).  
+
+
+## Data security, privacy and regulation
+> In the design of any investigation, consideration of issues related to data security, privacy and complying with relevant regulations should be paramount. It is especially important to be aware that combining different data from different ‘anonymised’ sources can mean that individual cases become identifiable.
+
+
+> Another point to be aware of is that just because data has been made available on the internet, doesn’t mean that that others are free to use it as they wish. This is a very complex area and laws vary between jurisdictions.
+
+
+## Reproducible research
+
+
+> Reproducibility refers to the idea that when the results of a statistical analysis are reported, sufficient information is provided so that an independent third party can repeat the analysis and arrive at the same results.  
+
+
+
+## Replication can be hard, or expensive or impossible, for example if:
+- The study is big;    
+- The study relies on data collected at great expense or over many years; or    
+- The study is of a unique occurrence     
+
+Due to the possible difficulties of replication, reproducibility of the statistical analysis is often a reasonably alternative standard
+
+
+
+## Elements required for reproducibility
+
+- The original data and the computer code to be made available.
+
+
+- full documentation (eg description of each data variable, an audit trail describing the decisions made when cleaning and processing the data, and full documented code).
+
+- a good version control (eg:git).    
+
+- documenting the software environment, the computing architecture, the operating system, the software toolchain, external dependencies and version numbers can all be important in ensuring reproducibility.         
+- Where there is randomness in the statistical or machine learning techniques being used (for example random forests or neural networks) or where simulation is used, replication will require the random seed to be set.    
+
+## Problems without Reproducibility
+
+
+> Doing things ‘by hand’ is very likely to create problems in reproducing the work. Examples of doing things by hand are:  
+
+- manually editing spreadsheets ;  
+- Editing tables and figures;   
+- Downloading data manually from a website ;    
+- Pointing and clicking (unless the software used creates an audit trail of what has been clicked).
+
+
+
+## The value of reproducibility
+> Many actuarial analyses are undertaken for commercial, not scientific, reasons and are not published, but reproducibility is still valuable:       
+
+- Necessary for a complete technical work review  to ensure the analysis has been correctly carried out and the conclusions are justified by the data and analysis;          
+              
+- To investigate the effect of changes to the analysis, or to incorporate new data;             
+- To compare the results of an investigation with a similar one carried out in the past;             
+- the discipline of reproducible research, with its emphasis on good documentation of processes and data storage, can lead to fewer errors that need correcting in the original work and, hence, greater efficiency.          
+
+
+
+
+## Issues that reproducibility does not address:    
+
+- Reproducibility does not mean that the analysis is correct.but, by making clear how the results are achieved, it does allow transparency so that incorrect analysis can be appropriately challenged.        
+
+- If activities involved in reproducibility happen only at the end of an analysis, this may be too late for resulting challenges to be dealt with. For example, resources may have been moved on to other projects.
+
+
