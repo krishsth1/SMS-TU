@@ -1,0 +1,1594 @@
+---
+title: "ADSL"
+author: "Krishna Kumar Shrestha"
+date: "7/1/2020"
+output: html_document
+---
+
+
+
+```{r}
+
+library(tidyr)
+library(readxl)
+library(dplyr)
+
+library(haven)
+
+dm <- read_sas("sdtm/dm.sas7bdat", 
+               NULL)
+
+sc <- read_sas("sdtm/sc.sas7bdat", 
+               NULL)
+ds <- read_sas("sdtm/ds.sas7bdat", 
+               NULL)
+suppdv <- read_sas("sdtm/suppdv.sas7bdat", 
+                   NULL)
+
+vs <- read_sas("sdtm/vs.sas7bdat", NULL)
+adsl <- read_sas("adam/adsl.sas7bdat", NULL)
+co <- read_sas("sdtm/co.sas7bdat", NULL)
+lb <- read_sas("sdtm/lb.sas7bdat", NULL)
+
+sv <- read_sas("sdtm/sv.sas7bdat", NULL)
+suppdm <- read_sas("sdtm/suppdm.sas7bdat", 
+    NULL)
+ce <- read_sas("sdtm/ce.sas7bdat", NULL)
+
+lb <- read_sas("sdtm/lb.sas7bdat", NULL)
+ex <- read_sas("sdtm/ex.sas7bdat", NULL)
+suppce <- read_sas("sdtm/suppce.sas7bdat", 
+    NULL)
+
+```
+
+
+
+
+# ALL PREDECESSOR
+
+
+```{r}
+
+adsl_1<- dm %>% select(STUDYID,INVID,INVNAM,SITEID,USUBJID,SUBJID,AGE,AGEU,BRTHDTC,SEX,RACE,ETHNIC,COUNTRY,ARM,ARMCD,ACTARM,ACTARMCD,DTHFL)
+
+
+```
+
+
+
+
+
+#10
+
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(AGEGR1=case_when(
+  AGE < 35  ~ "<35",
+  AGE>=35 & AGE < 50 ~ "35-50",
+  AGE>=50 ~ ">50"
+))
+
+
+```
+
+
+#11
+
+```{r}
+
+
+adsl_1<-adsl_1 %>% mutate(AGEGR1N=case_when(
+  AGE<35 ~ 1,
+  AGE>=35 & AGE<50 ~2,
+  AGE>=50~3
+))
+
+
+
+```
+
+#12
+```{r}
+adsl_1<- adsl_1 %>% mutate(AGEGR2= case_when(
+  AGE<=18 ~ "<18",
+  AGE>18 & AGE<=64 ~"19-64",
+  AGE>64 ~">=65"
+))
+```
+
+#13
+
+
+```{r}
+adsl_1 <-  adsl_1 %>% mutate(AGEGR2N=case_when(
+  AGE<=18~ 1,
+  AGE>=19 & AGE<=64 ~2,
+  AGE>64 ~3
+))
+
+
+
+
+```
+
+#14
+```{r}
+adsl_1 <-adsl_1 %>% mutate(AGEGR3=case_when(
+  AGE>17 & AGE<=64 ~"18-64",
+  AGE>64 & AGE<=84 ~"65-84",
+  AGE>=84 ~">=85"
+))
+```
+#15
+```{r}
+adsl_1 <- adsl_1 %>% mutate(AGEGR3N= case_when(
+  AGE>17 & AGE<=64 ~ 1,
+  AGE>64 & AGE<=84 ~ 2,
+  AGE>=84 ~ 3
+))
+```
+
+
+#16
+```{r}
+adsl_1<- adsl_1 %>% mutate(AGEGR4=case_when(
+  AGE<50 ~ "<50",
+  AGE>=50 ~ ">=50"
+))
+```
+#17
+```{r}
+adsl_1<-adsl_1 %>% mutate(AGEGR4N=case_when(
+  AGE<50 ~ 1,
+  AGE >=50 ~ 2
+))
+```
+
+
+#20
+```{r}
+adsl_1 <- adsl_1 %>% mutate(SEXN= case_when(
+  SEX == "M" ~ 2,
+  TRUE ~ 1
+))
+```
+
+
+#21
+SC.SCSTRESC WHERE SC.SCTESTCD = "GENDER"
+
+
+```{r}
+a1 <- sc %>% 
+  filter(SCTESTCD == "GENDER") %>% 
+    distinct(USUBJID,.keep_all = TRUE) %>% 
+  mutate(SRGENDER=SCSTRESC) %>%
+  select(USUBJID,SRGENDER,SCSTRESC)
+
+adsl_1<- adsl_1 %>%
+  full_join(a1)
+
+
+  
+  
+```
+
+
+#22
+
+Numeric code variable of SRGENDER.
+
+
+
+```{r}
+adsl_1 <- adsl_1 %>% 
+  mutate(SRGENDRN=case_when(
+    SRGENDER =="FEMALE"~1,
+    TRUE~2
+  )
+)
+
+
+```
+
+
+
+#24
+
+```{r}
+adsl_1 <-adsl_1 %>% mutate(RACEN=case_when(
+  RACE == "AMERICAN INDIAN OR ALASKA NATIVE"~1,
+RACE =="ASIAN"~2,
+RACE=="BLACK OR AFRICAN AMERICAN"~3,
+RACE=="MULTIPLE"~4,
+RACE=="WHITE"~6
+  ))
+```
+
+
+
+
+
+#25
+
+
+```{r}
+
+
+L<- suppdm %>% filter(QNAM == "RACEOR") 
+
+
+
+
+
+```
+
+
+
+#27
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(RACEGR1= case_when(
+  RACE == "WHITE" ~ "WHITE",
+  RACE == NA ~ "MISSING",
+  RACE != "WHITE" ~ "NON WHITE"
+))
+
+```
+#28
+```{r}
+adsl_1 <- adsl_1 %>% mutate(RACEGR1N=case_when(
+  RACEGR1== "WHITE" ~ 1,
+  RACEGR1 =="NON WHITE" ~ 2,
+  RACEGR1 == NA ~ 3
+  ))
+```
+
+
+#29
+
+
+```{r}
+
+adsl_1 <-adsl_1 %>% mutate(RACEGR2=case_when(
+  RACE=="BLACK OR AFRICAN AMERICAN" ~ "BLACK/AFRICAN AMERICAN",
+  !is.na(RACE) ~ "NON-BLACK/AFRICAN AMERICAN",
+  is.na(RACE)~ "MISSING"
+  ))
+
+
+```
+
+
+
+#30
+
+```{r}
+adsl_1 <-adsl_1 %>% mutate(RACEGR2N=case_when(
+  RACE=="BLACK OR AFRICAN AMERICAN" ~ 1,
+  !is.na(RACE) ~ 2,
+  is.na(RACE)  ~ 3
+))
+
+
+
+```
+
+
+
+
+#32
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(ETHNICN = case_when(
+  ETHNIC=="HISPANIC OR LATINO"~ 1,
+  ETHNIC=="NOT HISPANIC OR LATINO"~2
+))
+
+
+
+```
+
+
+
+
+
+#33
+```{r}
+adsl_1 <- adsl_1 %>% mutate(AETHNIC = case_when(
+  ETHNIC == NA~"Missing",
+  ETHNIC=="HISPANIC OR LATINO"~"HISPANIC OR LATINO" ,
+  ETHNIC=="NOT HISPANIC OR LATINO"~"NOT HISPANIC OR LATINO"
+))
+```
+
+#34
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(AETHNICN =case_when(
+  AETHNIC == "HISPANIC OR LATINO"~1,
+  AETHNIC =="NOT HISPANIC OR LATINO"~2,
+  AETHNIC == NA ~3
+  
+)
+)
+
+```
+#36
+```{r}
+adsl_1 <- adsl_1 %>% mutate(COUNTRYN = case_when(
+  COUNTRY == "USA"~84,
+  COUNTRY == "CAN" ~14
+)
+)
+
+```
+
+
+#37
+#problem
+
+
+
+
+
+
+#41
+
+
+
+```{r}
+
+
+
+
+dummy1<- ds %>% 
+  filter(DSSCAT =="SCREEN") %>%
+  select(DSSCAT,DSSTDTC,VISITNUM,USUBJID)
+  
+pr <- dummy1 %>% mutate(SCRNFL=case_when(
+  (DSSCAT == "SCREEN" & DSSTDTC !=NA) | VISITNUM == 10 ~"Y",
+  TRUE ~"N"
+)) %>% distinct(USUBJID,.keep_all = TRUE)%>%
+   select(SCRNFL,USUBJID)
+adsl_1 <- adsl_1 %>% full_join(pr)
+
+
+
+```
+
+
+#42
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% 
+  mutate(SCRNFN = case_when(
+    SCRNFL =="Y"~1,
+    TRUE ~2
+  )
+)
+
+
+```
+
+
+
+#43
+
+```{r}
+
+dm2 <- ds %>% select(DSDECOD,DSSCAT,USUBJID)
+
+pr2 <- dm2 %>% mutate(ENRLFL=case_when(
+  DSDECOD =='INFORMED CONSENT OBTAINED' & DSSCAT =='STUDY'~"N",
+  DSDECOD !='INFORMED CONSENT OBTAINED' & DSSCAT !='STUDY' ~"Y"
+)) %>% distinct(USUBJID,.keep_all = TRUE) %>%
+  select(USUBJID,ENRLFL)
+
+adsl_1 <- adsl_1 %>% full_join(pr2)
+
+
+
+
+```
+
+
+#44
+
+```{r}
+
+adsl_1 <- adsl_1 %>%
+  mutate(ENRLFN = case_when(
+    ENRLFL =="Y"~1,
+    TRUE ~2
+  )
+)
+
+```
+
+
+
+#49
+
+IF IN DS THERE IS A RECORD WITH(DSSCAT='STUDY CONCLUSION'
+AND EPOCH='FOLLOW-UP' AND DSDECOD='COMPLETED') 
+OR (DSDECOD = 'CONTINUATION TO FOLLOW UP PHASE') 
+THEN LTFUFL = "Y". ELSE "N".
+
+
+```{r}
+
+dm3 <- ds %>% filter(DSSCAT == 'STUDY CONCLUSION' | EPOCH =='FOLLOW-UP' |
+                       DSDECOD=="COMPLETED" | DSDECOD ==
+                       'CONTINUATION TO FOLLOW UP PHASE')
+
+pr3 <- dm3 %>% mutate(LTFUFL=
+case_when(
+ ( DSSCAT == 'STUDY CONCLUSION' &
+    EPOCH =='FOLLOW-UP' &
+    DSDECOD=="COMPLETED") |
+   DSDECOD == 'CONTINUATION TO FOLLOW UP PHASE' ~"Y",
+ TRUE~"N"
+)) %>% distinct(USUBJID,.keep_all = TRUE)%>%
+  select(USUBJID,LTFUFL)
+
+
+
+adsl_1 <- adsl_1 %>% full_join(pr3)
+
+table(adsl$LTFUFL)
+table(adsl_1$LTFUFL)
+```
+
+
+#50
+
+```{r}
+
+
+adsl_1 <- adsl_1 %>% mutate(LTFUFN = case_when(
+  LTFUFL == "Y"~1,
+  TRUE~2
+)
+)
+```
+
+#51
+#IF SUBJECT HAS TWO CONSECUTIVE RECORDS (BUT ON DIFFERENT DAYS) WHERE #LB.LBTESTCD="HIV1RNA" AND LB.LBMETHOD="POLYMERASE CHAIN REACTION" AND LB.LBSTRESN #>= 200 THEN CVFFL="Y", ELSE CVFFL="N". NOTE: IF A SUBJECT HAS MORE THAN ONE RECORD #ON THE SAME DAY, THEN TAKE THE WORST VALUE (I.E. THE MAXIMUM VALUE).
+
+
+
+```{r}
+
+dm4 <- lb %>% filter(LBTESTCD == "HIV1RNA" |
+                       LBMETHOD=="POLYMERASE CHAIN REACTION" |
+                       LBSTRESN >=200)
+
+pr4 <- dm4 %>% mutate(CVFFL=case_when(
+  (LBTESTCD == "HIV1RNA" &
+                       LBMETHOD=="POLYMERASE CHAIN REACTION" &
+                       LBSTRESN >=200) ~"Y",
+  TRUE ~"N"
+)) %>% distinct(USUBJID,.keep_all = TRUE) %>% select(USUBJID,CVFFL)
+
+
+adsl_1 <- adsl_1 %>% full_join(pr4)
+
+```
+
+
+#52
+
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(CVFFN= case_when(
+  CVFFL=="Y"~1,
+  TRUE ~ 0
+)
+)
+
+
+
+
+```
+
+#58
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(TRTO1PN=case_when(
+  ARM =="CAB LA (600 mg) + RPV LA (900 mg) Q2M"~"1",
+  ARM =="Oral DTG (50mg) + RPV (25mg) daily"~"2",
+  ARM == "Not Assigned"~"3"
+ ))
+```
+
+
+#57
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(TRT01P = case_when(
+  TRTO1PN =="1"~ "Q2M",
+  TRTO1PN =="2"~"DTG+RPV",
+  TRTO1PN =="3"~"Not Assigned"
+)
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+# 60
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(TRT01AN = case_when(
+  ACTARM =="CAB LA (600 mg) + RPV LA (900 mg) Q2M" ~"1",
+  ACTARM =="Oral DTG (50mg) + RPV (25mg) daily" ~"2",
+  ACTARM =="Not Assigned"~"3"
+)
+)
+
+
+
+
+
+```
+
+
+
+#59
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(TRT01A=case_when(
+  TRT01AN =="1"~"Q2M",
+  TRT01AN =="2" ~ "DTG + RPV",
+  TRT01AN =="3"~"Not Assigned"
+  
+  
+)
+)
+
+
+```
+
+
+
+#39
+
+IF TRT01A IS NOT MISSING AND SUBJECT HAS A RECORD WHERE EX.EXSTDTC IS NOT MISSING THEN SAFFL="Y", ELSE SAFFL="N".
+
+
+```{r}
+
+dm5 <- ex %>% 
+  filter(!is.na(EXSTDTC) == TRUE) %>% 
+  distinct(USUBJID,.keep_all = TRUE) %>%
+  select(USUBJID,EXSTDTC)
+
+adsl_1 <- adsl_1 %>%
+  full_join(dm5) %>%
+  mutate(SAFFL=case_when(
+    !is.na(TRT01A) & !is.na(EXSTDTC)~"Y",
+    TRUE ~"N"
+  ))
+
+```
+
+
+
+#40
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(SAFFN = case_when(
+  SAFFL =="Y"~1,
+  TRUE~0
+)
+)
+
+
+
+```
+
+
+
+
+#41
+
+
+IF (UPCASE(DS.DSSCAT)="SCREEN" AND DS.DSSTDTC IS NOT NULL) OR (INT(VISITNUM)=10 AND SV.SVSTDTC IS NOT NULL) THEN SCRNFL="Y", ELSE SCRNFL="N".
+
+
+```{r}
+
+try1<- ds %>% filter(DSSCAT=="SCREEN") %>% 
+  distinct(USUBJID,.keep_all = TRUE) %>%
+  select(DSSCAT,DSSTDTC,VISITNUM,USUBJID)
+try2 <- sv %>% filter(!is.na(SVSTDTC)==TRUE) %>% 
+  distinct(USUBJID,.keep_all = TRUE) %>%
+  select(USUBJID,SVSTDTC)
+
+try3<- try1 %>% mutate(SCRNFL=case_when(
+  (DSSCAT =="SCREEN" &
+    !is.na(DSSTDTC) ) |
+   ( VISITNUM =10 &
+    !is.na(try2$SVSTDTC)) ~"Y",
+  TRUE ~"N"
+)) %>% 
+  select(USUBJID,SCRNFL)
+
+
+adsl_1 <- adsl_1 %>% full_join(try3)
+
+rm(try1,try2,try3)
+  
+
+```
+
+
+
+#42
+
+
+```{r}
+adsl_1 <- adsl_1 %>%
+  mutate(SCRNFN =case_when(
+    SCRNFL == "Y" ~ 1,
+    TRUE~2
+  )
+)
+
+
+```
+
+
+
+
+#43
+
+ENRLFL ASSIGNED VALUE OF "N" UNLESS A SUBJECT HAS A DISPOSITION RECORD WHERE THE VALUE OF DSDECOD SHOWS 'INFORMED CONSENT OBTAINED' AND THE VALUE OF DSSCAT SHOWS 'STUDY'  THEN ENRLFL IS ASSIGNED "Y".
+
+
+```{r}
+
+try1 <- ds %>% mutate(ENRLFL=case_when(
+  !is.na(DSCAT) &
+    DSDECOD =='INFORMED CONSENT OBTAINED' &
+    DSSCAT =="STUDY" ~"N",
+  TRUE~"Y"
+)) %>% distinct(USUBJID,.keep_all = TRUE) %>%
+  select(USUBJID,ENRLFL)
+adsl_1 <- adsl_1 %>% full_join(try1)
+rm(try1)
+
+```
+
+
+
+#44
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(ENRLFN=case_when(
+  ENRLFL =="Y"~1,
+  TRUE~2
+)
+)
+
+
+```
+
+
+
+
+
+#61
+Numeric date part of the earliest EX.EXSTDTC. where EXTRT contains CAB LA or RPV LA or DOLUTEGRAVIR
+
+
+
+```{r}
+try1<- ex %>% 
+  filter(EXTRT =="CAB LA" | EXTRT =="RPV LA" |
+           EXTRT == "DOLUTEGRAVIR/RILPIVIRINE" ) %>%
+  group_by(USUBJID) %>%
+  mutate(TRTSDT=as.Date(min(EXSTDTC))) %>%
+  summarise_all(first) %>%
+  select(USUBJID,TRTSDT)
+
+adsl_1 <- adsl_1 %>% full_join(try1)
+rm(try1)
+table(adsl_1$TRTSDT)
+
+```
+
+#62
+Numeric date part of the latest of EX.EXSTDTC and EX.EXENDTC. where EXTRT contains CAB LA or RPV LA or DOLUTEGRAVIR
+
+
+
+```{r}
+
+try1<- ex %>% 
+  filter(EXTRT =="CAB LA" | EXTRT =="RPV LA" |
+           EXTRT == "DOLUTEGRAVIR/RILPIVIRINE" ) %>%
+  group_by(USUBJID) %>%
+  mutate(TRTEDT=as.Date(max(EXSTDTC))) %>%
+  summarise_all(last) %>%
+  select(USUBJID,TRTEDT)
+
+adsl_1 <- adsl_1 %>% full_join(try1)
+
+sum(is.na(adsl_1$TRTEDT))
+
+rm(try1)
+
+```
+
+
+#46
+
+IF TRT01P IS NOT MISSING AND SUBJECT HAS A RECORD WHERE EX.EXSTDTC IS NOT MISSING THEN ITTEFL="Y", ELSE ITTEFL="N".
+
+```{r}
+
+try14 <- ex 
+
+try15 <- adsl_1
+ try15 <- full_join(try15,try14) %>%
+   distinct(USUBJID,.keep_all = T)
+ try15 <- try15 %>% mutate(ITTEFL=case_when(
+   !is.na(TRT01P) &
+     !is.na(SUBJID) &
+     !is.na(EXSTDTC) ~"Y",
+   TRUE~"N"
+ )) %>% select(USUBJID,ITTEFL)
+ 
+ adsl_1 <- adsl_1 %>% full_join(try15)
+ 
+
+
+```
+
+#47
+EQUIVALENT OF ITTEFL
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(MNTFL=ITTEFL
+)
+
+```
+
+
+#63
+
+IF SUBJECT WITH MNTFL VALUE OF "Y" ALSO HAS A RECORD WHERE DS.DSSCAT="STUDY CONCLUSION" THEN MNTCMPS="COMPLETED", ELSE IF MNTFL="Y" AND DS.DSSCAT="STUDY TREATMENT DISCONTINUATION" THEN MNTCMPS="WITHDRAWN", ELSE IF MNTFL="Y" THEN  MNTCMPS="ONGOING".
+
+```{r}
+
+try1 <- ds %>% filter(DSSCAT =="STUDY CONCLUSION" |
+                        DSSCAT=="STUDY TREATMENT DISCONTINUATION") %>%
+  select(USUBJID,DSSCAT)
+try2 <- adsl_1
+try2 <- try2 %>% full_join(try1)
+
+try2 <-  try2 %>% mutate(MNTCMPS=case_when(
+  MNTFL == "Y" &
+    DSSCAT =="STUDY CONCLUSION" ~"COMPLETED",
+  MNTFL =="Y" &
+    DSSCAT =="STUDY TREATMENT DISCONTINUATION" ~ "WITHDRAWN",
+  MNTFL=="Y"~"ONGOING"
+)
+                         ) %>% select(USUBJID,MNTCMPS) %>% distinct(USUBJID,.keep_all = TRUE)
+
+
+adsl_1 <- adsl_1 %>% distinct(USUBJID,.keep_all = TRUE) %>%
+  full_join(try2) %>% distinct(USUBJID,.keep_all = TRUE)
+
+
+rm(try1,try2)
+```
+
+
+
+#64
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(MNTCMPSN= case_when(
+  MNTCMPS == "COMPLETED" ~1,
+  MNTCMPS == "WITHDRAWN"~2,
+  MNTCMPS =="ONGOING" ~3,
+  TRUE ~4
+))
+```
+
+
+
+#66
+
+
+IF SUBJECT HAS A RECORD WHERE DSSCAT='STUDY CONCLUSION' AND EPOCH='FOLLOW-UP' AND DSDECOD='COMPLETED' AND TRT01P NE 'DTG + RPV' THEN LTFCMPS='COMPLETED'. ELSE IF DSDECOD='CONTINUATION TO FOLLOW UP PHASE' AND TRT01P NE 'DTG + RPV' THEN LTFCMPS='ONGOING'.
+
+
+```{r}
+
+try1 <- ds %>% filter(DSSCAT =="STUDY CONCLUSION" | 
+                        EPOCH=='FOLLOW-UP' |
+                        DSDECOD=='COMPLETED' |
+                        DSDECOD =='CONTINUATION TO FOLLOW UP PHASE') %>%
+  select(USUBJID,DSSCAT,EPOCH,DSDECOD) %>%
+  distinct(USUBJID,.keep_all = TRUE)
+
+try2 <- adsl_1 
+
+try2 <- try2 %>% full_join(try1)  %>%
+  mutate(LTFCMPS=case_when(
+    DSSCAT =="STUDY CONCLUSION" &
+     EPOCH=='FOLLOW-UP' &
+      DSDECOD =='COMPLETED'  &
+      TRT01P != 'DTG + RPV' ~"COMPLETED",
+    DSDECOD =='CONTINUATION TO FOLLOW UP PHASE' &
+      TRT01P !='DTG + RPV'~"ONGOING",
+    TRUE~"NA"
+  )) %>%
+  select(USUBJID,LTFCMPS)
+
+
+adsl_1 <- adsl_1 %>%
+  full_join(try2) %>% distinct(USUBJID,.keep_all = TRUE)
+rm(try1,try2)
+
+```
+
+
+
+
+
+
+#67
+IF THE VALUE OF LTFCMPS SHOWS "ONGOING" THEN LTFCMPSN =1; IF IT SHOWS "COMPLETED" THEN LTFCMPSN =2; IF IT SHOWS "WITHDRAWAL" THEN LTFCMPSN =3;
+
+```{r}
+
+adsl_1<- adsl_1 %>% mutate(LTFCMPSN=case_when(
+  LTFCMPS =="ONGOING"~1,
+  LTFCMPS =="COMPLETED"~2,
+  LTFCMPS =="WITHDRAWAL"~3
+  
+))
+```
+
+
+
+
+#68
+
+IF SUBJECT HAS A RECORD WHERE CE.CECAT="LIVER EVENT REPORTING" AND (SUPPCE.QNAM="LERMX" AND SUPPCE.QVAL="LIVER EVENT STOPPING CRITERIA") THEN LSEFL="Y", ELSE LSEFL="N".
+
+
+
+```{r}
+try1 <- ce %>% mutate(LSEFL=case_when(
+  ce$CECAT =="LIVER EVENT REPORTING"&
+    suppce$QNAM=="LERMX" &
+    suppce$QVAL =="LIVER EVENT STOPPING CRITERIA" ~"Y",
+  TRUE ~"N"
+)) %>% select(LSEFL,USUBJID)
+
+adsl_1 <- adsl_1 %>% full_join(try1)
+rm(try1)
+
+```
+
+
+
+
+
+
+#69
+```{r}
+
+
+adsl_1 <- adsl_1 %>% mutate(LSEFN=case_when(
+  LSEFL =="Y"~1,
+  TRUE~2
+)
+)
+
+
+
+
+```
+
+
+
+#71
+
+IF DTHFL="Y" THEN DTHFN=1, BLANK OTHERWISE.
+```{r}
+adsl_1 <- adsl_1 %>% mutate(DTHFN=case_when(
+  DTHFL == "Y"~"1",
+  TRUE~ ""
+))
+
+
+```
+
+
+
+#72
+
+WHEN COUNTRY='CAN' THEN ASSIGN ACOUNTRY='CANADA'; ELSE WHEN COUNTRY='USA' ASSIGN ACOUNTRY='UNITED STATES'
+
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(ACOUNTRY = case_when(
+  COUNTRY =="CAN"~"CANADA",
+  COUNTRY =="USA"~"UNITED STATES"
+))
+
+
+```
+
+
+
+
+#73
+
+
+IF SUBJECT HAS A RECORD WHERE THE VALUE OF VISIT CONTAINS 'END OF MAINTENANCE PHASE' OR (DS.DSSCAT CONTAINS 'DISCONTINU' AND  'STUDY'). AND TRTSDT FOR THIS PERSON IS NOT MISSING, THEN MDSFL="Y". OTHERWISE MDSFL IS "N".
+
+
+
+```{r}
+try1<- ds %>% filter(VISIT == 'END OF MAINTENANCE PHASE' |
+                       DSSCAT=='STUDY TREATMENT DISCONTINUATION') %>%
+  distinct(USUBJID,.keep_all = TRUE)
+
+try2 <- adsl_1
+try2 <- try2  %>%full_join(try1) %>% mutate(MDSFL=case_when(
+  VISIT == 'END OF MAINTENANCE PHASE'  |
+    (DSSCAT=='STUDY TREATMENT DISCONTINUATION' &
+    !is.na(TRTSDT)) ~"Y",
+  TRUE~"N"
+    
+)) %>% select(USUBJID,MDSFL)
+
+adsl_1 <- adsl_1 %>% full_join(try2)
+
+
+rm(try1,try2)
+
+```
+
+
+
+#74
+
+Only populate for subjects with MDSFL = "Y". Find records in DS where visit contains 'END OF MAINTENANCE PHASE' or (DSSCAT contains "DISCONTINU" and  'STUDY'). DISCREAS then equals DS.DSDECOD.
+
+```{r}
+try1<- ds %>% filter(VISIT == 'END OF MAINTENANCE PHASE' |
+                       DSSCAT=='STUDY TREATMENT DISCONTINUATION') %>%
+  distinct(USUBJID,.keep_all = TRUE)
+try2 <- adsl_1 
+
+
+try2 <- try2 %>% full_join(try1) 
+try2 <- try2 %>% mutate(DISCREAS=case_when(
+  MDSFL == "Y" &
+    VISIT == "END OF MAINTENANCE PHASE" |
+    DSSCAT == "STUDY TREATMENT DISCONTINUATION" ~ as.character(DSDECOD),
+  T ~"na"
+)) %>% select(USUBJID,DISCREAS)
+
+adsl_1 <- adsl_1 %>% full_join(try2) %>% distinct(USUBJID,.keep_all = TRUE)
+rm(try1,try2)
+```
+
+
+
+
+
+#75
+
+
+MNTSDT IS EQUIVALENT TO TRTSDT.
+
+
+
+```{r}
+
+
+adsl_1<- adsl_1 %>% mutate(MNTSDT=TRTSDT)
+
+```
+
+
+
+#76
+
+If the subject is rescreened (i.e. DM.SUBJID="MULTPLE") then concatenate all of the subject's screening dates from DS.DSSTDTC (converted to DATE9. format) where DS.VISITNUM = 10 together, separated by a comma.
+
+
+
+
+
+
+
+
+#80
+```{r}
+try1<- vs %>% filter(VSDY <=1) %>%
+  filter(VSTEST == "Height" | VSTEST ==  "Weight") %>%
+  select(USUBJID,VSTEST,VSORRES) %>% 
+  pivot_wider(names_from = VSTEST,values_from = VSORRES)
+
+
+try1$Height <- as.numeric(try1$Height)
+try1$Weight <- as.numeric(try1$Weight)
+
+try1 <- try1 %>% mutate(BMIBL = Weight/((Height/100)*(Height/100))) %>%
+  select(BMIBL,USUBJID)
+
+adsl_1 <- adsl_1 %>% full_join(try1)
+
+rm(try1)
+
+
+
+
+```
+
+
+#81
+#IF . < BMIBL < 30 THEN BMIGR1N=1, ELSE IF BMIBL >= 30 THEN BMIGR1N=2, 
+#OTHERWISE BLANK.
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(BMIGR1N=case_when(
+  BMIBL <30~1,
+  BMIBL >=30 ~2
+))
+
+
+adsl_1 <- adsl_1 %>% distinct(USUBJID,.keep_all = TRUE)
+
+
+```
+#82
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(BMIGR1=case_when(
+  BMIGR1N==1~"<30",
+  BMIGR1N == 2~ ">=30"
+  
+))
+
+```
+#83
+
+
+
+
+#BMIUNIT = 'kg/m2' if bmibl=weightbl/((heightbl/100)*(heightbl/100)) is not Null.
+```{r}
+adsl_1 <- adsl_1 %>% mutate(BMIUNIT=case_when(
+  is.na(BMIGR1N)~"na",
+  TRUE ~"kg/m2"
+))
+
+```
+
+#84
+#HTUNIT = VSSTRESU where VSTESTCD="HEIGHT" and ^missing(VSSTRESN)
+
+```{r}
+
+try1<- vs %>% filter(VSTESTCD =="HEIGHT") %>% select(USUBJID,VSTESTCD,VSSTRESN,VSSTRESU,VSDTC)
+ 
+try2<- adsl_1 
+ try2 <- try2 %>% full_join(try1)%>%
+mutate(HTUNIT=case_when(
+  VSTESTCD =="HEIGHT" & !is.na(VSSTRESN)~ as.character(VSSTRESU),
+  TRUE~"na"
+)) %>% select(USUBJID,HTUNIT)
+
+adsl_1 <- adsl_1 %>% full_join(try2) %>% distinct(USUBJID,.keep_all = T)
+
+
+rm(try1,try2)
+
+```
+#85
+
+#SELECT LATEST RECORDS WHERE UPCASE(VSTESTCD) CONTAINS 'HEIGHT'
+# AND NON-NULL VSDTC VALUES ARE EITHER  BEFORE OR ON THE TREATMENT START DATE.  
+#  HEIGHTBL=VSSTRESN
+```{r}
+try1<- vs %>% filter(VSTESTCD =="HEIGHT") %>% select(USUBJID,VSTESTCD,VSSTRESN,VSSTRESU,VSDTC)
+
+
+try2 <- adsl_1
+try2<- try2 %>% full_join(try1) %>% mutate(HEIGHTBL=case_when(
+  VSTESTCD =="HEIGHT" & !is.na(VSDTC)~as.character(VSSTRESN),
+  TRUE~"na"
+)) %>% select(USUBJID,HEIGHTBL)
+
+adsl_1 <- adsl_1 %>% full_join(try2)
+
+
+rm(try1,try2)
+
+```
+#86
+#WTUNIT = VSSTRESU where VSTESTCD="WEIGHT" and ^missing(VSSTRESN)
+```{r}
+dum1<- vs %>% filter(VSTESTCD == "WEIGHT") %>% select(USUBJID,VSSTRESU,VSTESTCD,VSSTRESN,VSDTC)
+dum1 <- dum1 %>% distinct(USUBJID,.keep_all = TRUE)
+try2<- adsl_1
+
+try2 <- full_join(try2,dum1)
+try2 <- try2 %>% mutate(WTUNIT=case_when(
+  VSTESTCD =="WEIGHT" & !is.na(VSSTRESN)~as.character(VSSTRESU),
+  TRUE~"na"
+)) %>% select(USUBJID,WTUNIT)
+
+
+adsl_1 <- adsl_1 %>% full_join(try2)
+
+
+rm(try2)
+  
+```
+
+
+#87
+#SELECT LATEST RECORDS WHERE UPCASE(VSTESTCD) CONTAINS 'WEIGHT' 
+#AND NON-NULL VSDTC VALUES ARE EITHER  BEFORE OR ON THE TREATMENT START DATE.    
+#WEIGHTBL=VSSTRESN
+
+```{r}
+dum1<- vs %>% filter(VSTESTCD == "WEIGHT") %>% select(USUBJID,VSSTRESU,VSTESTCD,VSSTRESN,VSDTC)
+
+try2 <- adsl_1
+try2<- try2 %>% full_join(dum1) %>% mutate(WEIGHTBL=case_when(
+  VSTESTCD =="WEIGHT" & !is.na(VSDTC)~as.character(VSSTRESN),
+  TRUE~"na"
+)) %>% select(USUBJID,WEIGHTBL)
+
+adsl_1 <- adsl_1 %>% full_join(try2)
+
+rm(try2)
+```
+
+
+
+
+#88
+#If subject has a pre-treatment record where CO.COVAL="HBV DNA DETECTED" 
+#then HEPBST="Positive". 
+#Else if subject has a pre-treatment record where LB.LBTESTCD in 
+#("HBVDNA" "HBVDNAC" "HBVDNAL"): if LB.LBSTRESN ne . or LB.LBORRES ne "<x" 
+#then HEPBST="Positive", else HEPBST="Negative". 
+#Else if subject has a pre-treatment record where LB.LBTESTCD="HBSAGZ": 
+#if LB.LBSTRESC="REACTIVE" then HEPBST="Positive", 
+#else if LB.LBSTRESC="NON-REACTIVE" then HEPBST="Negative".
+
+```{r}
+
+try1<- co %>% filter(COVAL=="HBV DNA DETECTED" )
+try2 <- lb  %>% filter(EPOCH=="FOLLOW-UP", LBTESTCD =="HBVDNA" &
+                         LBTESTCD =="HBVDNAC"&
+                         LBTESTCD =="HBVDNAL" &
+                         LBTESTCD == "HBSAGZ")
+
+try2 <- try2 %>% full_join(try1) %>%
+  mutate(HEPBST=case_when(
+    COVAL == "HBV DNA DETECTED" ~"Positive",
+    (LBTESTCD =="HBVDNA" &
+      LBTESTCD =="HBVDNAC" & LBTESTCD =="HBVDNAL") ~"Positive",
+      
+    TRUE~"Negative"
+  )) %>% select(USUBJID,HEPBST)
+
+adsl_1 <- adsl_1 %>% full_join(try2)%>%
+  distinct(USUBJID,.keep_all = T)
+table(adsl_1$HEPBST)
+table(adsl$HEPBST)
+
+```
+#94
+#Numeric date part of the latest of EX.EXSTDT and EX.EXENDT 
+#where EX.EXROUTE="ORAL" or EX.EXTPT="ORAL DOSE".
+# Set to TRTEDT for TRT01PN=2.
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+#97
+#VALUE OF SVSTDTC WHERE VISIT='MONTH 12'
+
+```{r}
+a2<- sv %>% filter(VISIT == "MONTH 12") %>% select(USUBJID,SVSTDTC,VISIT)
+
+adsl_1<- full_join(adsl_1,a2)
+
+
+
+adsl_1 <- adsl_1 %>% mutate(MTH12SDT=case_when(
+  VISIT =="MONTH 12" ~ as.character(SVSTDTC),
+  TRUE ~"NA"
+)
+) %>% select(-SVSTDTC,-VISIT)
+
+```
+#VALUE OF SVSTDTC WHERE VISIT='MONTH 26'
+#MTH26SDT
+
+#98
+```{r}
+a3<- sv %>% filter(VISIT == "MONTH 26") %>% select(USUBJID,SVSTDTC,VISIT)
+
+adsl_1<- full_join(adsl_1,a3)
+
+
+
+adsl_1 <- adsl_1 %>% mutate(MTH26SDT=case_when(
+  VISIT =="MONTH 26" ~ as.character(SVSTDTC),
+  TRUE ~"NA"
+)
+) %>% select(-SVSTDTC,-VISIT)
+
+
+
+```
+
+#99
+#IF SUBJECT HAS A RECORD WHERE Y8.Y8TESTCD="HIVRFKNW" THEN HIVRKFL="Y",
+# ELSE HIVRKFL="N".
+```{r}
+y8 <- read_sas("sdtm/y8.sas7bdat", NULL)
+
+a12<- y8 %>% filter(Y8TESTCD=="HIVRFKNW") %>% select(USUBJID,Y8TESTCD)
+adsl_1 <- full_join(adsl_1,a12)
+adsl_1 <- adsl_1 %>% mutate(HIVRKFL = case_when(
+  Y8TESTCD == "HIVRFKNW" ~"Y",
+  TRUE~"N"
+))
+
+```
+
+
+
+
+
+
+
+
+
+
+#90
+If subject has a pre-treatment record where LB.LBTESTCD in ("HCVRNA" "HCVRNAL"): if LB.LBORRES ne "TARGET NOT DETECTED" or LB.LBSTRESN ne . then HEPCST="Positive", else HEPCST="Negative". Else if subject has a pre-treatment record where LB.LBTESTCD="HCVABZ": if LB.LBSTRESC in ("REACTIVE" "BORDERLINE") then HEPCST="Positive", else if LB.LBSTRESC="NON-REACTIVE" then HEPCST="Negative".
+
+
+
+
+```{r}
+
+try11<- lb %>% mutate(HEPCST=case_when(
+  
+  (LBTESTCD =="HCVRNA" &
+     LBTESTCD=="HCVRNAL" )&
+   (LBORRES !="TARGET NOT DETECTED" |
+       LBSTRESN != ".") ~"Positive",
+  
+  
+  lb$LBTESTCD == "HCVABZ" & lb$LBSTRESC == "REACTIVE" &
+    lb$LBSTRESC == "BORDERLINE" ~"Positive",
+  lb$LBSTRESC=="NON-REACTIVE"~"Negative"
+  
+))  %>% distinct(USUBJID,.keep_all = TRUE)
+
+table(try11$HEPCST)
+
+```
+
+
+# 95
+Numeric date part of the latest of EX.EXSTDTC and EX.EXENDTC where EX.EXROUTE="INTRAMUSCULAR".
+
+
+Numeric date part of the earliest EX.EXSTDTC. where EXTRT contains CAB LA or RPV LA or DOLUTEGRAVIR
+
+```{r}
+
+
+
+
+```
+
+
+
+
+#100
+
+
+Concatenate all values of Y8.Y8STRESC where Y8.Y8TESTCD="HIVRF", separated by a semi colon. Order the values based on Y8.Y8SEQ, except for where Y8.Y8STRESC="OTHER", which should be kept last in the list of values.
+
+
+
+
+```{r}
+y8 <- read_sas("sdtm/y8.sas7bdat", NULL)
+
+
+```
+
+
+
+
+#101
+The latest value of LB.LBSTRESN where LB.LBTESTCD="CD4" and LB.LBDTC is on or before TRTSDT. Note that pre-dose unscheduled visits are included.
+
+
+```{r}
+
+try1<- adsl_1 %>% full_join(lb)
+
+
+try1$LBDTC <- as.Date(try1$LBDTC)
+
+try1<- try1  %>%filter(LBTESTCD=="CD4") %>% group_by(USUBJID)%>%
+  mutate(CD4BL=case_when(
+    LBDTC <= TRTSDT~ LBSTRESN
+  )) %>% select(USUBJID,CD4BL) %>% distinct(USUBJID,.keep_all = TRUE) 
+
+
+adsl_1 <- adsl_1 %>% full_join(try1)
+
+rm(try1)
+
+```
+
+
+
+
+#103
+IF . < CD4BL < 350 THEN CD4BLG1N=1, ELSE IF 350 =< CD4BL < 500 THEN CD4BLG1N=2, ELSE IF CD4BL >= 500 THEN CD4BLG1N=3.
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(CD4BLG1N=case_when(
+  CD4BL < 350~"1",
+  CD4BL >=350 & CD4BL <500~"2",
+  TRUE~"3",
+  is.na(CD4BL)~"0"
+))
+```
+
+
+#102
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(CD4BLGR1=case_when(
+  CD4BLG1N == "1"~"<350",
+  CD4BLG1N== "2"~"350-<500",
+  CD4BLG1N== "3"~">=500"
+)
+)
+
+
+```
+#105
+
+
+
+
+If subject has a record where CE.CECAT="HIV ASSOCIATED CONDITIONS" and CE.CESTDTC non-missing and CE.CESTDTC is on/before TRTSDT then CDCBCATN=3. Else if . < CD4BL < 200 then CDCBCATN=3, else if 200 =< CD4BL < 500 then CDCBCATN=2, else if CD4BL >= 500 then CDCBCATN=1. Else if CD4BL is missing then find the subjects latest record where LB.LBTESTCD="CD4LY" and LB.LBDTC is on/before TRTSDT, and if . < LB.LBSTRESN < 14 then CDCBCATN =3, else if 14 =< LB.LBSTRESN < 26 then CDCBCATN =2, else if LB.LBSTRESN >= 26 then CDCBCATN=1. Otherwise CDCBCATN is missing. Where CD4BL is the latest value of LB.LBSTRESN where LB.LBTESTCD="CD4" and numeric date part of LB.LBDTC is on or before TRTSDT.
+```{r}
+
+rm1<- full_join(ce,lb)
+rm1$LBDTC <- as.Date(rm1$LBDTC)
+rm1$CESTDTC <-as.Date(rm1$CESTDTC)
+
+rm1<-full_join(rm1,adsl_1)
+rm1<- rm1 %>% mutate(CDCBCATN=case_when(
+  CECAT =="HIV ASSOCIATED CONDITIONS" &
+    !is.na(CESTDTC) &
+    (CESTDTC) <= TRTSDT ~"3",
+  CD4BL >= 200 & CD4BL < 500 ~"2",
+  CD4BL >= 500 ~"1",
+  is.na(CD4BL) &
+    LBTESTCD =="CD4LY" &
+    (LBDTC) <=TRTSDT &
+    LBSTRESN <14~"3",
+  LBSTRESN >=14 & LBSTRESN <26~"2",
+  LBSTRESN >=26~"1",
+  TRUE ~"missing"
+)
+) %>% distinct(USUBJID,.keep_all = TRUE) %>% select(CDCBCATN,USUBJID)
+
+adsl_1 <-adsl_1 %>% full_join(rm1)
+rm(rm1)
+```
+
+
+
+#106
+If subject has a record where MH.MHTERM="DEPRESSION" and MH.MHOCCUR="Y" and MH.VISITNUM=10 and MH.MHSTRF="BEFORE" then HISDEPFL="Y", else HISDEPFL="N".
+
+
+```{r}
+
+mh <- read_sas("sdtm/mh.sas7bdat", NULL)
+
+rm(rm1)
+rm2<-mh %>% filter(
+                     MHTERM =="DEPRESSION"&
+                     MHOCCUR=="Y" &
+                     VISITNUM ==10 &
+                   MHSTRF =="BEFORE"
+                   )
+rm1<- rm2 %>% 
+  mutate(HISDEPFL=case_when(
+  MHPRESP =="Y" & 
+    MHTERM == "DEPRESSION" &
+    MHOCCUR =="Y" &
+    VISITNUM ==10 &
+    MHSTRF =="BEFORE" ~"Y",
+TRUE~"N"  
+)) %>% select(HISDEPFL,USUBJID) #%>% distinct(USUBJID,.keep_all = TRUE)
+
+
+adsl_1 <- adsl_1 %>% full_join(rm1) %>% distinct(USUBJID,.keep_all = TRUE)
+adsl_1$HISDEPFL[is.na(adsl_1$HISDEPFL)]<-"N"
+table(adsl_1$HISDEPFL)
+
+```
+
+
+
+#107
+If subject has a record where MH.MHTERM="SUICIDAL IDEATION" and MH.MHOCCUR="Y" and MH.MHOCCUR="Y" and MH.MHSTRF="BEFORE" then HISDEPFL="Y", else HISDEPFL="N".
+
+
+
+
+
+```{r}
+
+rm1<- mh %>% filter(MHTERM=="SUICIDAL IDEATION" &
+                     MHOCCUR=="Y" &
+                      MHOCCUR=="Y" &
+                     MHSTRF=="BEFORE" )
+
+rm1 <- rm1 %>% mutate(HISSUIFL=case_when(
+  MHTERM=="SUICIDAL IDEATION" &
+                     MHOCCUR=="Y" &
+                      MHOCCUR=="Y" &
+                     MHSTRF=="BEFORE" ~"Y",
+  TRUE ~ "N"
+)) %>% select(HISSUIFL,USUBJID)
+
+adsl_1 <- adsl_1 %>% full_join(rm1)
+
+
+adsl_1$HISSUIFL[is.na(adsl_1$HISSUIFL)]<-"N"
+
+rm(rm1)
+
+```
+
+#108
+
+
+
+If subject has a record where MH.MHTERM="ANXIETY" and MH.MHOCCUR="Y" and MH.VISITNUM=10 and MH.MHSTRF="BEFORE" then HISDEPFL="Y", else HISDEPFL="N".
+
+```{r}
+
+try1 <- mh %>% filter(MHTERM == "ANXIETY" &
+                        MHOCCUR=="Y" &
+                        VISITNUM==10 &
+                        MHSTRF=="BEFORE")
+
+try1 <- try1 %>% mutate(HISANXFL= case_when(
+  MHTERM == "ANXIETY" &
+                        MHOCCUR=="Y" &
+                        VISITNUM==10 &
+                        MHSTRF=="BEFORE" ~"Y",
+  TRUE~"N"
+)) %>% select(HISANXFL,USUBJID)
+adsl_1 <- adsl_1 %>% full_join(try1)
+adsl_1$HISANXFL[is.na(adsl_1$HISANXFL)]<- "N"
+rm(try1)
+```
+
+
+#109
+
+If HISANXFL="Y" then HISANX="previous history of anxiety", else HISANX="no previous history of anxiety".
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(HISANX= case_when(
+  HISANXFL =="Y"~"previous history of anxiety",
+  TRUE~"no previous history of anxiety"
+))
+
+
+```
+
+
+
+
+#110
+
+If HISSUIFL="Y" then HISSUI="previous history of suicidal ideation", else HISSUI="no previous history of suicidal ideation".
+
+
+
+
+```{r}
+
+adsl_1 <- adsl_1 %>% mutate(HISSUI=case_when(
+  HISSUIFL =="Y"~ "previous history of suicidal ideation",
+  TRUE~"no history of suicidal ideation"
+))
+
+
+```
+
+#111
+
+
+If HISDEPFL="Y" then HISDEP="previous history of depression", else HISDEP="no previous history of depression".
+
+
+```{r}
+adsl_1 <- adsl_1 %>% mutate(HISDEP=case_when(
+  HISDEPFL =="Y"~"previous history of depression",
+  TRUE~"no previous history of depression"
+))
+
+
+```
+
+
+
+#88
+
