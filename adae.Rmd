@@ -1,0 +1,185 @@
+---
+title: "adae"
+author: "Krishna Kumar Shrestha"
+date: "July 11, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Installing library and importing data
+
+
+
+
+```{r}
+library(haven)
+library(dplyr)
+
+library(lubridate)
+
+adsl <- read_sas("C:/Users/krishna/Desktop/adam/adsl.sas7bdat", 
+    NULL)
+adae <- read_sas("C:/Users/krishna/Desktop/adam/adae.sas7bdat", 
+    NULL)
+
+ae <- read_sas("C:/Users/krishna/Desktop/sdtm/ae.sas7bdat", 
+    NULL)
+
+```
+
+
+
+# Variable no 1  and 3
+
+```{r}
+
+adae1<- ae %>% select(STUDYID,USUBJID,AESTDTC)
+
+
+```
+
+
+# variable 2 and 4:19
+
+```{r}
+dumy1 <- adsl %>% select(SITEID,USUBJID,
+LTSUBJID,
+AGE,
+AGEU,
+SEX,
+RACE,
+COUNTRY,
+PPROTFL,
+SCRNFL,
+SAFFL,
+ENRLFL,
+ITTEFL,
+LTFUFL,
+TRT01P,
+TRT01PN,
+TRT01A,
+TRT01AN
+)
+
+
+adae1 <- adae1 %>% full_join(dumy1) %>% na.omit()
+rm(dumy1)
+
+```
+
+
+
+
+# variable 20: 23
+ADSL.TRT01P
+ADSL.TRT01PN
+ADSL.TRT01A
+ADSL.TRT01AN
+TRTP
+TRTPN
+TRTA
+TRTAN
+
+
+```{r}
+
+dumy1<- adsl %>% select(TRT01P,TRT01PN,TRT01A,TRT01AN,USUBJID) %>%
+  rename(TRTP=TRT01P,TRTPN=TRT01PN,TRTA=TRT01A,TRTAN=TRT01AN)
+
+adae1 <- adae1 %>% full_join(dumy1) %>% na.omit()
+rm(dumy1)
+
+
+```
+
+
+
+# vaiable no 24 :33
+
+
+
+```{r}
+
+
+
+a<- adsl %>% select(TRTSDT,
+TRTEDT,
+MNTEDT,
+HISDEP,
+HISDEPFL,
+HISSUI,
+HISSUIFL,
+HISANX,
+HISANXFL,USUBJID)
+adae1 <- adae1 %>% full_join(a) %>% na.omit()
+rm(a)
+
+```
+
+
+# 36 ASTDT
+
+
+If the start day is missing, the first of the month will be used unless this is before the start date of study treatment; in this case the study treatment start date will be used.
+
+
+```{r}
+
+a<- adae1
+a$AESTDTC <- ymd(a$AESTDTC,truncated = 1)
+
+
+a <- a %>% mutate(ASTDT=case_when(
+  AESTDTC <= TRTSDT~ as.Date(TRTSDT),
+  TRUE ~ as.Date(AESTDTC)
+))%>%   select(ASTDT,USUBJID)
+
+
+adae1 <- full_join(adae1,a)
+rm(a)
+
+```
+
+
+#37
+
+
+DDMONYYYY format of non-missing AE.AESTDTC. If date is partial then replace missing elements with -.
+ADAE.ASTDTC
+
+
+
+```{r}
+
+a<- adae1
+a$AESTDTC <- ymd(a$AESTDTC)
+a <- a%>% mutate(ASTDTC=AESTDTC)
+a$ASTDTC<-format(a$ASTDTC, "%d/%b/%Y")
+a$ASTDTC[is.na(a$ASTDTC)]<-"-"
+
+
+```
+
+
+
+
+
+```{r}
+
+df<- adae1
+library(tidyr)
+
+df <- df %>% separate(AESTDTC, c("A", "B","C"))
+
+df <- df %>% select(A,B,C)
+
+
+```
+
+
+
+
